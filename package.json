@@ -1,15 +1,28 @@
 {
   "name": "pom2",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "private": true,
+  "description": "Playwright Page Object Model tests for the QEdge Stock Accounting ERP",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "typecheck": "tsc --noEmit",
+    "test:smoke": "playwright test tests/smoke",
+    "test:write": "playwright test tests/regression/record-creation.spec.ts --workers=1",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "@playwright/test": "^1.63.0",
-    "@types/node": "^26.6.3"
+    "@types/node": "^26.6.3",
+    "read-excel-file": "^9.3.10",
+    "typescript": "^6.0.2"
   }
 }

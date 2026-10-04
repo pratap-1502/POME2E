@@ -1,0 +1,50 @@
+{
+  "suppliers": [
+    {
+      "SupplierName": "John",
+      "Address": "USA",
+      "City": "London",
+      "Country": "UK",
+      "ContactPerson": "Qedge",
+      "PhoneNumber": "876543",
+      "Email": "john@gmail.com",
+      "MobileNumber": "765432",
+      "Notes": "Added Supplier"
+    },
+    {
+      "SupplierName": "David",
+      "Address": "New York",
+      "City": "New York",
+      "Country": "USA",
+      "ContactPerson": "Smith",
+      "PhoneNumber": "99887766",
+      "Email": "david@gmail.com",
+      "MobileNumber": "88990011",
+      "Notes": "Supplier Two"
+    }
+  ],
+  "customers": [
+    {
+      "CustomerName": "Test123",
+      "Address": "SR Nagar",
+      "City": "Hyderabad",
+      "Country": "India",
+      "ContactPerson": "Ranga",
+      "PhoneNumber": "98765",
+      "Email": "test@gmail.com",
+      "MobileNumber": "76543",
+      "Notes": "Customer Added"
+    },
+    {
+      "CustomerName": "Kumar",
+      "Address": "Ameerpet",
+      "City": "Hyderabad",
+      "Country": "India",
+      "ContactPerson": "Mahesh",
+      "PhoneNumber": "99999999",
+      "Email": "kumar@gmail.com",
+      "MobileNumber": "88888888",
+      "Notes": "Customer Two"
+    }
+  ]
+}
