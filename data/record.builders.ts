@@ -43,12 +43,9 @@ export function buildCustomer(): CustomerInput {
 export function buildStockItem(): StockItemInput {
   const suffix = uniqueSuffix()
   return {
-    category: 'Automation',
     name: `Automation Stock ${suffix}`,
-    unitOfMeasurement: 'Piece',
     purchasingPrice: '100',
     sellingPrice: '125',
-    quantity: '10',
     notes: `Created by Playwright test ${suffix}`,
   }
 }

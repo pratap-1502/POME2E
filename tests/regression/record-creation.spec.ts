@@ -78,27 +78,9 @@ test.describe('record creation @regression @write', () => {
   test('sale can be added successfully', async ({
     customersPage,
     salesPage,
-    stockItemsPage,
-    suppliersPage,
   }) => {
-    const supplier = buildSupplier()
     const customer = buildCustomer()
-    const stockItem = buildStockItem()
     const sale = buildSale()
-
-    await suppliersPage.goto()
-    await suppliersPage.openAddForm()
-    await suppliersPage.fillForm(supplier)
-    await suppliersPage.submit()
-    await suppliersPage.confirmAdd()
-    await expectAddSucceeded(suppliersPage.feedback)
-
-    await stockItemsPage.goto()
-    await stockItemsPage.openAddForm()
-    await stockItemsPage.fillForm(stockItem, supplier.name)
-    await stockItemsPage.submit()
-    await stockItemsPage.confirmAdd()
-    await expectAddSucceeded(stockItemsPage.feedback)
 
     await customersPage.goto()
     await customersPage.openAddForm()
@@ -112,15 +94,12 @@ test.describe('record creation @regression @write', () => {
     const generatedNumber = await salesPage.generatedNumber()
     await salesPage.fillForm(sale, {
       customerName: customer.name,
-      stockItemName: stockItem.name,
     })
     await salesPage.submit()
     await salesPage.confirmAdd()
 
-    await expect(salesPage.page).toHaveURL(/a_saleslist\.php/)
+    await expect(salesPage.page).toHaveURL(/a_sales_detaillist\.php/)
     await expectAddSucceeded(salesPage.feedback)
     expect(generatedNumber).toMatch(/^Sales-\d+$/)
   })
 })
-
-

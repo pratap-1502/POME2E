@@ -6,7 +6,6 @@ import { BaseListPage } from './base/BaseListPage'
 
 type SaleRelations = {
   readonly customerName: string
-  readonly stockItemName: string
 }
 
 export class SalesPage extends BaseListPage {
@@ -16,8 +15,11 @@ export class SalesPage extends BaseListPage {
   readonly salesNumberInput: Locator
   readonly customerSelect: Locator
   readonly notesInput: Locator
+  readonly supplierSelect: Locator
   readonly stockItemSelect: Locator
   readonly quantityInput: Locator
+  readonly salesPriceInput: Locator
+  readonly totalPaymentInput: Locator
   readonly submitButton: Locator
 
   constructor(page: Page) {
@@ -28,8 +30,11 @@ export class SalesPage extends BaseListPage {
     this.salesNumberInput = page.locator('#x_Sales_Number')
     this.customerSelect = page.locator('#x_Customer_ID')
     this.notesInput = page.locator('#x_Notes')
+    this.supplierSelect = page.locator('#x1_Supplier_Number')
     this.stockItemSelect = page.locator('#x1_Stock_Item')
-    this.quantityInput = page.locator('#x1_Quantity')
+    this.quantityInput = page.locator('#x1_Sales_Quantity')
+    this.salesPriceInput = page.locator('#x1_Sales_Price')
+    this.totalPaymentInput = page.locator('#x_Total_Payment')
     this.submitButton = page.locator('#btnAction')
   }
 
@@ -46,8 +51,21 @@ export class SalesPage extends BaseListPage {
   async fillForm(data: SaleInput, relations: SaleRelations) {
     await this.customerSelect.selectOption({ label: relations.customerName })
     await this.notesInput.fill(data.notes)
-    await this.stockItemSelect.selectOption({ label: relations.stockItemName })
-    await this.quantityInput.fill(data.quantity)
+    await this.supplierSelect.selectOption({ index: 1 })
+    await this.stockItemSelect.locator('option').nth(1).waitFor({
+      state: 'attached',
+    })
+    await this.stockItemSelect.selectOption({ index: 1 })
+    await this.quantityInput.click()
+    await this.quantityInput.press('ControlOrMeta+A')
+    await this.quantityInput.pressSequentially(data.quantity)
+    await this.quantityInput.press('Tab')
+
+    const totalPayment = (await this.salesPriceInput.inputValue()).replaceAll(
+      ',',
+      '',
+    )
+    await this.totalPaymentInput.fill(totalPayment)
   }
 
   async submit() {

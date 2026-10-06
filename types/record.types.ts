@@ -14,12 +14,9 @@ export type SupplierInput = PartyInput
 export type CustomerInput = PartyInput
 
 export interface StockItemInput {
-  readonly category: string
   readonly name: string
-  readonly unitOfMeasurement: string
   readonly purchasingPrice: string
   readonly sellingPrice: string
-  readonly quantity: string
   readonly notes: string
 }
 

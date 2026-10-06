@@ -14,15 +14,6 @@ import {
 } from './support/partyFlows'
 
 const workbookPath = resolve(process.cwd(), 'TestData', 'ERPExceldata.xlsx')
-const suppliers = ExcelFileUtil.getExcelData<SupplierDataRecord>(
-  workbookPath,
-  'supplierdata',
-)
-const customers = ExcelFileUtil.getExcelData<CustomerDataRecord>(
-  workbookPath,
-  'customerdata',
-)
-
 test.describe('multiple ERP data from Excel @regression @write', () => {
   test.describe.configure({ mode: 'serial' })
   test.skip(
@@ -39,29 +30,33 @@ test.describe('multiple ERP data from Excel @regression @write', () => {
     await expect(loginPage.loginButton).toBeVisible()
   })
 
-  for (const supplierRecord of suppliers) {
-    test(`Validate Supplier: ${supplierRecord.Name}`, async ({
-      sidebar,
-      suppliersPage,
-    }) => {
+  test('Validate suppliers from Excel', async ({ sidebar, suppliersPage }) => {
+    const suppliers = await ExcelFileUtil.getExcelData<SupplierDataRecord>(
+      workbookPath,
+      'supplierdata',
+    )
+
+    for (const supplierRecord of suppliers) {
       await createAndVerifySupplier(
         suppliersPage,
         sidebar,
         mapSupplierData(supplierRecord),
       )
-    })
-  }
+    }
+  })
 
-  for (const customerRecord of customers) {
-    test(`Validate Customer Module: ${customerRecord.Name}`, async ({
-      customersPage,
-      sidebar,
-    }) => {
+  test('Validate customers from Excel', async ({ customersPage, sidebar }) => {
+    const customers = await ExcelFileUtil.getExcelData<CustomerDataRecord>(
+      workbookPath,
+      'customerdata',
+    )
+
+    for (const customerRecord of customers) {
       await createAndVerifyCustomer(
         customersPage,
         sidebar,
         mapCustomerData(customerRecord),
       )
-    })
-  }
+    }
+  })
 })
