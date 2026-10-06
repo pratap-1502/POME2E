@@ -1,11 +1,36 @@
 name: Playwright Tests
+
 on:
   push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+  schedule:
+    # GitHub Actions cron uses UTC. 02:15 UTC is 07:45 AM Asia/Calcutta.
+    - cron: '15 2 * * *'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: Test suite to run
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - smoke
+          - record-creation
+          - single-data-erp
+          - json-driven
+          - excel-driven
+
+permissions:
+  contents: read
+
+concurrency:
+  group: playwright-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
+    name: ${{ github.event_name == 'workflow_dispatch' && inputs.suite || 'all' }} tests
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
@@ -13,25 +38,65 @@ jobs:
       ERP_USERNAME: ${{ secrets.ERP_USERNAME }}
       ERP_PASSWORD: ${{ secrets.ERP_PASSWORD }}
       ERP_WORKERS: ${{ vars.ERP_WORKERS || 1 }}
+      # All suites except smoke create records in the ERP application.
+      RUN_MUTATING_TESTS: '1'
+
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-        cache: npm
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Chromium
-      run: npx playwright install --with-deps chromium
-    - name: Type check
-      run: npm run typecheck
-    - name: Run smoke tests
-      run: npm run test:smoke
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: |
-          playwright-report/
-          test-results/
-        retention-days: 30
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Run selected tests
+        shell: bash
+        env:
+          SELECTED_SUITE: ${{ github.event_name == 'workflow_dispatch' && inputs.suite || 'all' }}
+        run: |
+          case "$SELECTED_SUITE" in
+            smoke)
+              npx playwright test tests/smoke
+              ;;
+            record-creation)
+              npx playwright test tests/regression/record-creation.spec.ts
+              ;;
+            single-data-erp)
+              npx playwright test tests/SingleDataERP.spec.ts
+              ;;
+            json-driven)
+              npx playwright test tests/MultipleDataUsingJson.spec.ts
+              ;;
+            excel-driven)
+              npx playwright test tests/MultiDataUsingExcel.spec.ts
+              ;;
+            all)
+              npx playwright test
+              ;;
+            *)
+              echo "Unknown test suite: $SELECTED_SUITE"
+              exit 1
+              ;;
+          esac
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 30
